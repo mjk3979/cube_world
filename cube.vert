@@ -10,13 +10,13 @@ uniform float z_rot;
 
 mat3 rotation() {
 	float s[3];
-	s[0] = sin(z_rot);
+	s[0] = sin(x_rot);
 	s[1] = sin(y_rot);
-	s[2] = sin(x_rot);
+	s[2] = sin(z_rot);
 	float c[3];
-	c[0] = cos(z_rot);
+	c[0] = cos(x_rot);
 	c[1] = cos(y_rot);
-	c[2] = cos(x_rot);
+	c[2] = cos(z_rot);
     return mat3(vec3(c[0] * c[1], c[0] * s[1] * s[2] - c[2] * s[0], s[0] * s[2] + c[0] * c[2] * s[1])
 	          , vec3(c[1] * s[0], c[0] * c[2] + s[0] * s[1] * s[2], c[2] * s[0] * s[1] - c[0] * s[2])
 			  , vec3(-s[1], c[1] * s[2], c[1] * c[2]));
@@ -67,5 +67,5 @@ mat4 worldToClip() {
 }
 
 void main() {
-	gl_Position = worldToClip() * vec4(position, 1.0f);
+	gl_Position = worldToClip() * vec4(rotation() * position, 1.0f);
 }

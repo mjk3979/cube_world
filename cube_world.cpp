@@ -136,11 +136,13 @@ void drawCuboid(const std::string &name, const vec3 &location, const vec3 &sides
 	}
 }
 
+static vec3 main_rotation = {0.f, 0.f, 0.f};
+
 void draw() {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawBuffer(GL_BACK);
-	drawCuboid("ship", {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f}, {0.f, 0.f, 0.f});
+	drawCuboid("ship", {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f}, main_rotation);
 	glFlush();
 } 
 
@@ -228,11 +230,11 @@ int main(int argc, char *argv[]) {
 	}
 
 	glDisable(GL_DEPTH_TEST); 
-	camera.position.x = -2;
+	camera.position.x = 0;
 	camera.position.y = 0;
 	camera.position.z = 2;
 	camera.pitch = to_radians(0);
-	camera.yaw = to_radians(360-30);
+	camera.yaw = to_radians(0);
 	shaderMap["cube.vert"] = compileShaderProgram("cube.vert", GL_VERTEX_SHADER);
 	shaderMap["cube.frag"] = compileShaderProgram("cube.frag", GL_FRAGMENT_SHADER);
 	XSelectInput(dpy, win, ExposureMask | KeyPressMask);
@@ -265,18 +267,19 @@ int main(int argc, char *argv[]) {
 						exit(0);
 						break;
 					case 25: // w
-						camera.pitch += to_radians(5.f);
+						main_rotation.z += to_radians(5.f);
 						break;
 					case 39: // s
-						camera.pitch -= to_radians(5.f);
+						main_rotation.z -= to_radians(5.f);
 						break;
 					case 38: // a
-						camera.yaw += to_radians(5.f);
+						main_rotation.x -= to_radians(5.f);
 						break;
 					case 40: // d
-						camera.yaw -= to_radians(5.f);
+						main_rotation.x += to_radians(5.f);
 						break;
 				}
+				std::cout << "Rotation: " << to_degrees(main_rotation.x) << ", " << to_degrees(main_rotation.z) << std::endl;
 			}
 		}
 		//camera.yaw += to_radians(.4f);
