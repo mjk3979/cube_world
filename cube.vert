@@ -1,12 +1,15 @@
 #version 440
 layout(location=0) in vec3 position;
 
+out vec4 v_color;
+
 uniform vec3 eye;
 uniform float pitch;
 uniform float yaw;
 uniform float x_rot;
 uniform float y_rot;
 uniform float z_rot;
+uniform vec4 uColor;
 
 mat3 rotation() {
 	float s[3];
@@ -68,4 +71,5 @@ mat4 worldToClip() {
 
 void main() {
 	gl_Position = worldToClip() * vec4(rotation() * position, 1.0f);
+	v_color = uColor;
 }

@@ -29,6 +29,12 @@ struct vec3 {
 	float y;
 	float z;
 };
+struct vec4 {
+	float x;
+	float y;
+	float z;
+	float w;
+};
 std::map<std::string, unsigned> bufferMap;
 std::map<std::string, GLint> programMap;
 std::map<std::string, GLint> shaderMap;
@@ -49,7 +55,7 @@ static float to_degrees(float radians) {
 	return (radians / (2 * PI)) * 360.f;
 }
 
-void drawCuboid(const std::string &name, const vec3 &location, const vec3 &sides, const vec3 &rotation) {
+void drawCuboid(const std::string &name, const vec3 &location, const vec3 &sides, const vec3 &rotation, const vec4 color) {
 	static const GLfloat baseVertexes[][3] = {{-0.5, 0.5, -0.5}, {0.5,0.5,-0.5}, {-0.5, -0.5, -0.5}, {0.5, -0.5, -0.5},
 	                          {-0.5, 0.5, 0.5}, {0.5, 0.5, 0.5}, {-0.5, -0.5, 0.5}, {0.5, -0.5, 0.5}};
 	static const GLint vertexes[][3] = {{0, 1, 2}, {2, 1, 3}, {5, 4, 6}, {5, 6, 7}, {0, 4, 1}, {4, 5, 1}, {2, 3, 7}, {2, 7, 6}, {1, 5, 7}, {1, 7, 3}, {4, 0, 2}, {4, 2, 6}};
@@ -127,6 +133,9 @@ void drawCuboid(const std::string &name, const vec3 &location, const vec3 &sides
 	loc = glGetUniformLocation(program, "z_rot");
 	glUniform1f(loc, rotation.z);
 
+	loc = glGetUniformLocation(program, "uColor");
+	glUniform4fv(loc, 1, &color.x);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	glDrawElements(GL_TRIANGLES, numVertexes, GL_UNSIGNED_INT, 0);
 	auto error = glGetError();
@@ -142,7 +151,8 @@ void draw() {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawBuffer(GL_BACK);
-	drawCuboid("ship", {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f}, main_rotation);
+	drawCuboid("ground", {0.f, -3.f, 0.f}, {30.f, .1f, 30.f}, {0.f, 0.f, 0.f}, {0.f, 100.f/255.f, 0.f, 1.f});
+	drawCuboid("ship", {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f}, main_rotation, {0.f, 1.f, 1.f, 1.f});
 	glFlush();
 } 
 
