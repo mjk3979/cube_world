@@ -2,10 +2,9 @@
 layout(location=0) in vec3 position;
 
 out vec4 v_color;
+out vec2 v_texCoord;
 
-uniform vec3 eye;
-uniform float pitch;
-uniform float yaw;
+uniform mat4 viewMatrix;
 uniform float x_rot;
 uniform float y_rot;
 uniform float z_rot;
@@ -25,51 +24,9 @@ mat3 rotation() {
 			  , vec3(-s[1], c[1] * s[2], c[1] * c[2]));
 }
 
-mat4 worldToClip() {
-    float cosPitch = cos(pitch);
-    float sinPitch = sin(pitch);
-    float cosYaw = cos(yaw);
-    float sinYaw = sin(yaw);
- 
-    vec3 xaxis = { cosYaw, 0, -sinYaw };
-    vec3 yaxis = { sinYaw * sinPitch, cosPitch, cosYaw * sinPitch };
-    vec3 zaxis = { sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw };
- 
-    // Create a 4x4 view matrix from the right, up, forward and eye position vectors
-    mat4 viewMatrix = {
-        vec4(       xaxis.x,            yaxis.x,            zaxis.x,      0 ),
-        vec4(       xaxis.y,            yaxis.y,            zaxis.y,      0 ),
-        vec4(       xaxis.z,            yaxis.z,            zaxis.z,      0 ),
-        vec4( -dot( xaxis, eye ), -dot( yaxis, eye ), -dot( zaxis, eye ), 1 )
-    };
-
-	/*
-	const float left = -3.f;
-	const float right = 3.f;
-	const float bottom = -3.f;
-	const float top = 3.f;
-	const float far = 100.f;
-	const float near = .01f;
-	mat4 perMatrix = mat4(
-		vec4(near / right, 0.f, 0.f, 0.f),
-		vec4(0.f, near / top, 0.f, 0.f),
-		vec4(0.f, 0.f, -(far + near) / (far - near), -1.f),
-		vec4(0.f, 0.f, -2.f * near * far / (far - near), 0.f));
-	*/
-	const float d = 1.f/(tan(3.1415926f / 4.f));
-	const float n = .001;
-	const float f = 100.f;
-	const float a = 16.f / 9.f;
-	mat4 perMatrix = mat4(
-		vec4(d/a,0,0,0),
-		vec4(0,d,0,0),
-		vec4(0,0,(n+f)/(n-f), -1),
-		vec4(0,0,2.f*n*f / (n-f), 0));
-     
-    return perMatrix * viewMatrix;
-}
-
 void main() {
-	gl_Position = worldToClip() * vec4(rotation() * position, 1.0f);
+	vec3 worldPosition = rotation() * position;
+	gl_Position = viewMatrix * vec4(worldPosition, 1.0f);
+	v_texCoord = vec2(worldPosition.x * 0.5 + 0.5, worldPosition.z * 0.5 + 0.5);
 	v_color = uColor;
 }
